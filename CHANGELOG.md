@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.0.1] - 2026-04-08
+
+### Fixed
+- CLAUDE.md: Initial EM's style is EMPTY and Claude EM will ask the user for a value
+
 ## [v1.0.0] - 2026-04-07
 
 ### Added
