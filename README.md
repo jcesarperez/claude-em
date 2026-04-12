@@ -1,17 +1,30 @@
 # Claude EM
 
-Claude EM turns Claude into a practical, opinionated **assistant** that understands **your team, your context, and how you run engineering**.
+**Claude EM turns Claude into an Engineering Manager operating system.**
 
-Instead of starting from a blank prompt, Claude already knows:
+Not a generic AI. Not a blank prompt.
+
+A context-aware, opinionated system that understands:
 - your team
 - your context
-- how you like to work
+- how you run engineering
 
-It comes with **reusable skills** to support your initiatives and your day-to-day tasks, like planning, writing epics and stories, analyzing IC activity, preparing 1:1s, working with Jira, or drafting strategies.
+## Why Claude EM
 
-It is intentionally **CLI-first**: faster, more predictable, and more cost-efficient in terms of tokens than relying on MCP servers.
+It comes with:
+1. Persistent context → **your team** + **your way of working**
+2. Reusable workflows → **skills** that support real EM tasks
 
-Built for teams using **Jira** and **GitHub**. Other tools can be added via CLI scripts or MCP servers.
+Claude EM is built for **day-to-day EM work**:
+- Plan initiatives with clear scope and trade-offs
+- Write epics and stories that engineers can actually build
+- Analyze IC performance using real data (Jira + GitHub)
+- Prepare 1:1s with context and intent
+- Think through org and leadership decisions
+
+It is intentionally **CLI-first**: faster, more predictable, and more cost-efficient (tokens).
+
+Works out of the box with **Jira** and **GitHub**. Other tools can be added via CLI scripts or MCP servers.
 
 ---
 
@@ -47,7 +60,7 @@ claude
 ## How it works
 
 * **CLAUDE.md** defines your personal EM style and how Claude should behave
-* **Skills** (`.claude/skills/`) are reusable prompts for specific EM tasks
+* **Skills** (`.claude/skills/`) are reusable prompts for real EM tasks
 * **Team context** (`data/team_*.md`) defines your team
 * **Data** (`data/`) stores shared information (Jira, GitHub, etc.)
 * **Initiatives** are folders where work, analysis, and outputs live
@@ -87,25 +100,6 @@ claude-em/
     ├── scripts/                # Analysis and processing
     └── output/                 # Results and reports
 ```
-
----
-
-## Example use cases
-
-* Plan an initiative  
-  > Plan an initiative to reduce CI flakiness using our current setup  
-
-* Analyze IC activity  
-  > Analyze Javier's last 30 days activity
-
-* Prepare a 1:1  
-  > Prepare a 1:1 with ana who is delivering less lately and seems a bit disconnected
-
-* Write a strategy  
-  > Write a strategy to reduce operational load on the team  
-
-* Mentor me 
-  > I'm thinking of reorganizing the team, help me think this through
 
 ---
 
@@ -244,24 +238,28 @@ claude mcp add --plugin figma
 
 ## Updating
 
-Your workspace is independent from the template.
+Your workspace is yours.
 
 Check the repository releases to see:
 - New skills
 - Improvements
 - Bug fixes
 
-There is no need to stay fully in sync — adopt changes only when they are useful.
+Pull improvements when they’re useful.
 
 ---
 
 ## Contributing
 
-Contributions are welcome, especially:
+Contributions are welcome:
 
-* Feedback
+* Feedback from real usage
 * Suggestions
 * New skills
 * Support for additional tools
 
+---
 
+## License
+
+MIT
