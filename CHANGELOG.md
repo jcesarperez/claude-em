@@ -2,11 +2,15 @@
 
 ## [v1.1.0] - 2026-04-12
 
+### Added
+- MIT license
+
 ### Changed
 - `ic-activity` skill — Issue cycle time now calculated as `In Progress → Done` using Jira REST API changelog
 - `ic-activity` skill — In Focus, WIP = 0 is a red flag
 - `ic-activity` skill — Default time range is now 14 days when no date is specified
 - `ic-activity` skill — Quality and Collaboration sections now show individual metric scores inline when they differ from each other
+- Improved README for clarity and structure
 
 ### Fixed
 - `CLAUDE.md` — Tool priority order now puts project-specific Jira skills (e.g. `jira-xxx` or `jira`) first, before CLI and MCP tools
