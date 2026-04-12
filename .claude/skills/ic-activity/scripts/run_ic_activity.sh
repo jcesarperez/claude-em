@@ -14,8 +14,8 @@ if [[ -f "$ENV_FILE" ]]; then
   # shellcheck disable=SC1090
   source "$ENV_FILE"
 fi
-export JIRA_API_TOKEN=${JIRA_TOKEN:-${JIRA_API_TOKEN:-}}
 export GH_TOKEN=${GITHUB_TOKEN:-${GH_TOKEN:-}}
+export JIRA_API_TOKEN=${JIRA_TOKEN:-${JIRA_API_TOKEN:-}}
 
 # Compute period_days from FROM and TO
 if date -v-1d +"%Y-%m-%d" &>/dev/null 2>&1; then
@@ -73,15 +73,13 @@ gh search commits \
 # --- Jira issues completed ---
 jira issue list \
   -q "assignee = \"$JIRA_EMAIL_USER\" AND status = Done AND resolved >= \"$FROM\" AND resolved <= \"$TO\" AND issuetype != Epic" \
-  --raw \
-  --paginate 0:100 \
+  --raw --paginate 0:100 \
   > "$OUT_DIR/issues.json" 2>/dev/null || echo "[]" > "$OUT_DIR/issues.json"
 
 # --- Jira issues in progress (WIP) ---
 jira issue list \
   -q "assignee = \"$JIRA_EMAIL_USER\" AND status = 'In Progress' AND issuetype != Epic" \
-  --raw \
-  --paginate 0:100 \
+  --raw --paginate 0:100 \
   > "$OUT_DIR/issues_wip.json" 2>/dev/null || echo "[]" > "$OUT_DIR/issues_wip.json"
 
 # --- Metrics ---
@@ -109,6 +107,35 @@ OPEN_PRS=$(jq length "$OUT_DIR/prs_open.json")
 PRS_CLOSED_TOTAL=$(jq 'length' "$OUT_DIR/prs_closed.json")
 PRS_CANCELLED=$((PRS_CLOSED_TOTAL - PRS))
 
+# --- Issue cycle time: In Progress → Done via Jira changelog ---
+mkdir -p "$OUT_DIR/issue_details"
+jq -r 'if type == "array" then .[].key else empty end' "$OUT_DIR/issues.json" | \
+while read -r key; do
+  curl -s -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+    "${JIRA_URL}/rest/api/3/issue/${key}?expand=changelog&fields=changelog" \
+    | jq '
+        def parse_jira_date: gsub("\\.[0-9]+"; "") | gsub("([+-][0-9]{2}):?([0-9]{2})$"; "Z") | fromdateiso8601;
+        .changelog.histories
+        | map(select(.items[] | .field == "status"))
+        | {
+            in_progress: (map(select(.items[] | .toString == "In Progress")) | first | .created // null),
+            done:        (map(select(.items[] | .toString == "Done"))        | last  | .created // null)
+          }
+      ' \
+    > "$OUT_DIR/issue_details/${key}.json" 2>/dev/null || true
+done
+
+ISSUE_CYCLE_TIME_DAYS=$(
+  find "$OUT_DIR/issue_details" -name '*.json' -exec cat {} \; 2>/dev/null \
+  | jq -s '
+    def parse_jira_date: gsub("\\.[0-9]+"; "") | gsub("([+-][0-9]{2}):?([0-9]{2})$"; "Z") | fromdateiso8601;
+    [ .[] | select(.in_progress != null and .done != null) |
+      ((.done | parse_jira_date) - (.in_progress | parse_jira_date)) / 86400
+    ] |
+    if length > 0 then add / length | . * 10 | round / 10 else null end
+  '
+)
+
 # --- Per-PR details via API (size, comments, cycle time) ---
 mkdir -p "$OUT_DIR/pr_details"
 jq -r '.[] | .repository.nameWithOwner + " " + (.number | tostring)' "$OUT_DIR/prs.json" | \
@@ -124,13 +151,13 @@ PR_DETAILS_AGG=$(
   find "$OUT_DIR/pr_details" -name '*.json' -exec cat {} \; 2>/dev/null \
   | jq -s '
     if length == 0 then
-      { avg_pr_size: null, total_loc: null, comments_per_pr: null, avg_cycle_time_days: null }
+      { avg_pr_size: null, total_loc: null, comments_per_pr: null, pr_cycle_time_days: null }
     else
       {
         avg_pr_size: (map(.additions + .deletions) | add / length | . * 10 | round / 10),
         total_loc: (map(.additions + .deletions) | add),
         comments_per_pr: (map(.comments + .review_comments) | add / length | . * 10 | round / 10),
-        avg_cycle_time_days: (
+        pr_cycle_time_days: (
           map(
             select(.merged_at != null) |
             ((.merged_at | fromdateiso8601) - (.created_at | fromdateiso8601)) / 86400
@@ -144,7 +171,7 @@ PR_DETAILS_AGG=$(
 AVG_PR_SIZE=$(echo "$PR_DETAILS_AGG" | jq '.avg_pr_size')
 TOTAL_LOC=$(echo "$PR_DETAILS_AGG" | jq '.total_loc')
 COMMENTS_PER_PR=$(echo "$PR_DETAILS_AGG" | jq '.comments_per_pr')
-AVG_CYCLE_TIME_DAYS=$(echo "$PR_DETAILS_AGG" | jq '.avg_cycle_time_days')
+PR_CYCLE_TIME_DAYS=$(echo "$PR_DETAILS_AGG" | jq '.pr_cycle_time_days')
 
 # avg time for the IC to submit their first review on PRs assigned to them
 # For each PR the user reviewed, fetch PR details (created_at) and their first review (submitted_at)
@@ -197,10 +224,11 @@ cat <<EOF
   "col_avg_time_to_first_review_as_reviewer_hours": $AVG_TIME_TO_FIRST_REVIEW,
   "col_reviews": $REVIEWS,
   "col_reviews_per_week": $REVIEWS_PER_WEEK,
-  "del_avg_cycle_time_days": $AVG_CYCLE_TIME_DAYS,
+  "del_pr_cycle_time_days": $PR_CYCLE_TIME_DAYS,
   "del_commits": $COMMITS,
   "del_commits_per_pr": $COMMITS_PER_PR,
   "del_issues_by_type": $ISSUES_BY_TYPE,
+  "del_issue_cycle_time_days": $ISSUE_CYCLE_TIME_DAYS,
   "del_issues_completed": $ISSUES,
   "del_issues_per_week": $ISSUES_PER_WEEK,
   "del_prs_merged": $PRS,

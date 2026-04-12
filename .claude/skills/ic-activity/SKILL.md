@@ -21,7 +21,8 @@ bash .claude/skills/ic-activity/scripts/run_ic_activity.sh <github_username> <ji
 
 To resolve `github_username` and `jira_email` for a team member, check `data/team_*.csv` files first.
 
-**Date resolution** — convert user expressions to `from_date` and `to_date` before calling the script:
+**Date resolution** — convert user expressions to `from_date` and `to_date` before calling the script. If no time range is specified, default to the last 14 days:
+- (no date specified) → FROM = today - 14 days, TO = today
 - "last 14 days" → FROM = today - 14 days, TO = today
 - "last month" → FROM = first day of previous month, TO = last day of previous month
 - "February 2026" → FROM = 2026-02-01, TO = 2026-02-28
@@ -33,7 +34,8 @@ The script outputs JSON metrics (alphabetically sorted, prefixed by category):
   "col_avg_time_to_first_review_as_reviewer_hours": number,
   "col_reviews": number,
   "col_reviews_per_week": number,
-  "del_avg_cycle_time_days": number,
+  "del_issue_cycle_time_days": number,
+  "del_pr_cycle_time_days": number,
   "del_commits": number,
   "del_commits_per_pr": number,
   "del_issues_by_type": { "Bug": number, "Story": number, "Task": number, ... },
@@ -71,16 +73,21 @@ Single metric — score directly:
 ### Focus
 Single metric — score directly:
 - foc_wip_count: High ≤ 2 | Medium 3–4 | Low > 4
+- **Special case:** foc_wip_count = 0 is a red flag (⚠️), not a High score. It likely indicates work is not being tracked in Jira. Do not assign a score — flag it instead.
 
 ### Quality
 Score each metric independently, then average (round down to nearest tier):
-- qua_avg_pr_size: High < 400 | Medium 400–800 | Low > 800
+- qua_avg_pr_size: High < 500 | Medium 500–1000 | Low > 1000
 - qua_comments_per_pr: High < 6 | Medium 6–12 | Low > 12
+
+If the individual scores differ, show each metric's score inline next to its value in the report.
 
 ### Collaboration
 Score each metric independently, then average (round down to nearest tier):
 - col_reviews_per_week: High ≥ 8 | Medium 4–8 | Low < 4
 - col_avg_time_to_first_review_as_reviewer_hours: High < 24h | Medium 24–48h | Low > 48h
+
+If the individual scores differ, show each metric's score inline next to its value in the report.
 
 ---
 
@@ -91,15 +98,15 @@ IC Activity Report (FROM to TO)
 Delivery
 - X issues completed (~X.X issues/week)
   - X Stories, X Tasks, X Bugs, X Sub-tasks, ...
-- Issue cycle time: Xd (if available)
+- Issue cycle time: Xd
 - Y PRs merged (~Y.Y PRs/week) — X LOC total
 - PR cycle time: Xd
 - Score: High | Medium | Low
 
 Current Focus
-- Issues in progress (WIP): X
+- Issues in progress (WIP): X  ← if 0, show ⚠️ Red flag: no WIP tracked — work may not be linked to Jira issues
 - Open PRs: X
-- Score: High | Medium | Low
+- Score: High | Medium | Low  ← omit score and show ⚠️ Red flag instead when WIP = 0
 
 Quality
 - Avg PR size: X LOC
@@ -109,7 +116,7 @@ Quality
 
 Collaboration
 - Reviews given: X (~X.X/week)
-- Avg time to first review as reviewer: Xh (if available)
+- Avg time to first review as reviewer: Xh
 - Score: High | Medium | Low
 
 Summary
