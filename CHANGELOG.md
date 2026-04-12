@@ -1,9 +1,27 @@
 # Changelog
 
+## [v1.1.0] - 2026-04-12
+
+### Changed
+- `ic-activity` skill — Issue cycle time now calculated as `In Progress → Done` using Jira REST API changelog
+- `ic-activity` skill — In Focus, WIP = 0 is a red flag
+- `ic-activity` skill — Default time range is now 14 days when no date is specified
+- `ic-activity` skill — Quality and Collaboration sections now show individual metric scores inline when they differ from each other
+
+### Fixed
+- `CLAUDE.md` — Tool priority order now puts project-specific Jira skills (e.g. `jira-xxx` or `jira`) first, before CLI and MCP tools
+- `write-us`, `write-epic-build`, `write-epic-technical-discovery` skills — Added explicit rule to invoke the appropriate Jira skill (`jira-xxx` or `jira`) for any Jira action (create, edit, update); MCP tools must not be called directly
+- `jira` skill — Added rule in Step 4 to always try the CLI first before falling back to MCP, even for structured descriptions
+- `jira` skill — Added explicit rule that this skill is the preferred entry point for any Jira action, including when triggered from another skill (e.g. `write-us`, `write-epic-build`)
+
+---
+
 ## [v1.0.1] - 2026-04-08
 
 ### Fixed
 - CLAUDE.md: Initial EM's style is EMPTY and Claude EM will ask the user for a value
+
+---
 
 ## [v1.0.0] - 2026-04-07
 
