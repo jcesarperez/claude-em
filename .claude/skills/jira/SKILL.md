@@ -1,16 +1,14 @@
 ---
 name: jira
 description: >
-  General-purpose Jira skill for any Jira project. Use for any Jira-related request:
-  creating issues (Epic, Story, Bug, Task, Sub-task), querying issues (in progress,
-  completed, by type/status, bugs by due date), or updating issues.
-  Triggers include: "create an epic", "create a bug", "show me bugs", "epics in progress",
-  "issues completed last N days", "bugs due in N days", or any request involving Jira.
+  General-purpose Jira skill for any Jira project. Use for any Jira-related request: creating issues (Epic, Story, Bug, Task, Sub-task), querying issues (in progress, completed, by type/status, bugs by due date), or updating issues.
+  Triggers include: "create an epic", "create a bug", "show me bugs", "epics in progress", "issues completed last N days", "bugs due in N days", or any request involving Jira.
+  Also triggers when any other skill (e.g. write-us, write-epic-build) reaches a "create in Jira" confirmation step or similar.
 ---
 
 # Skill: Jira — Project
 
-## Setup
+## Manual Setup
 
 Before using this skill, replace the following placeholders throughout this file — **including the `name:` and `description:` in the frontmatter above**:
 
@@ -24,6 +22,8 @@ Then replace the configuration placeholders:
 | `{{PROJECT_KEY}}` | Your Jira project key | Visible in any issue key (e.g. `PLAT-123` → key is `PLAT`) |
 | `{{CLOUD_ID}}` | Your Atlassian Cloud ID | Run `jira config list` or extract from your Atlassian URL |
 | `{{BASE_URL}}` | Your Jira domain | e.g. `yourcompany.atlassian.net` |
+
+Delete this section and the "Auto-detection" section below once you've replaced the placeholders.
 
 ---
 
@@ -157,6 +157,8 @@ Present the issue draft before creating. Ask the user to confirm or edit.
 **Do not create in Jira until explicit confirmation.**
 
 ### Step 4 — Create via CLI
+
+**Always try the CLI first.** Do not skip to MCP because the description is long or structured — use `--body` or pass the description via stdin. Only fall back to MCP if the CLI command fails or explicitly does not support a required field.
 
 ```bash
 jira issue create \

@@ -2,7 +2,7 @@
 name: write-epic-build
 description: >
   Use this skill whenever the user wants to write or create a Build Epic.
-  Triggers include: "write an epic", "create an implementation epic", "new feature epic", "build this", "implementation plan", or any request to define delivery of a feature, system, or technical solution.
+  Triggers include: "write an epic", "create an implementation epic", "new feature epic", "build this", "implementation plan", or any request to define delivery of a feature, system, or technical solution as an Epic.
   This skill handles the full flow: facilitating thinking, drafting the epic, and confirming with the user.
 ---
 
@@ -14,6 +14,12 @@ Your goal is **NOT** to generate the epic immediately.
 Your goal is to help the user think clearly, pragmatically, and in terms of delivery.
 
 You act as a strong peer (senior EM / staff engineer), not as an assistant.
+
+---
+
+## Jira interactions
+
+**For any Jira action (create, edit, update): always invoke the appropriate Jira skill — `jira-xxx` where `xxx` is the project key (e.g. `jira-fbx`), or `jira` as a generic fallback. Never call Jira MCP tools directly.**
 
 ---
 

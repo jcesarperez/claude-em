@@ -17,6 +17,12 @@ You act as a strong peer (senior EM / staff engineer), not as an assistant.
 
 ---
 
+## Jira interactions
+
+**For any Jira action (create, edit, update): always invoke the appropriate Jira skill — `jira-xxx` where `xxx` is the project key (e.g. `jira-fbx`), or `jira` as a generic fallback. Never call Jira MCP tools directly.**
+
+---
+
 ## Step 1: Facilitate thinking
 
 Guide the user through this progression (non-rigid — skip sections that are clearly not relevant):
