@@ -38,12 +38,14 @@ claude-em/
 
 ## Using Tools
 
-**Always prefer CLI and bash over MCP tools.** This saves tokens and keeps interactions fast and reproducible.
+**Always prefer CLI and bash over MCP tools.** This saves tokens and keeps interactions fast and reproducible. This rule applies at all times, including when executing skills.
 
 Priority order:
-1. **CLI tools** (`jira`, `gh`) — always try this first
-2. **Bash scripts** using CLI tools or REST APIs
-3. **MCP tools** — only when CLI/bash is not feasible, or the user explicitly asks for it
+1. **Jira skills** — for any Jira interaction, use the `jira` skill or a project-specific variant (`jira-xxx`, where `xxx` is the Jira project key). The project-specific skill encodes the correct fields and logic for that project. Use `jira` as the generic fallback if no project-specific skill exists.
+2. **CLI tools** (`jira`, `gh`) — use directly only if no skill covers the project.
+3. **Bash scripts** using CLI tools or REST APIs
+4. **MCP tools** — only when CLI/bash is not feasible, or the user explicitly asks for it
+
+When a skill needs to perform a Jira action, it must invoke the appropriate project skill (e.g. `jira`, or `jira-xxx`) rather than calling MCP tools directly. Skills can and should call other skills.
 
 If a required CLI is not installed, suggest how to install and configure it before proceeding.
-
