@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.2.0] - 2026-04-19
+
+### Added
+- `check-epic` skill — Evaluate the health of a Jira epic: definition quality, issue decomposition, and execution dynamics
+- `README.md` — "Use this template" now links directly to the GitHub template URL
+
+---
+
 ## [v1.1.0] - 2026-04-12
 
 ### Added
