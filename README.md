@@ -30,7 +30,7 @@ Works out of the box with **Jira** and **GitHub**. Other tools can be added via 
 
 ## Quick start (2 minutes)
 
-1. Click on **"Use this template"** and create your own repository
+1. Click on **[Use this template](https://github.com/new?template_name=claude-em&template_owner=jcesarperez)** and create your own repository
 
 2. Install Claude Code:
 
@@ -107,7 +107,7 @@ claude-em/
 
 ### 1. Create your workspace
 
-Click on **"Use this template"** and create your own repository.
+Click on **[Use this template](https://github.com/new?template_name=claude-em&template_owner=jcesarperez)** and create your own repository.
 
 This gives you a fully independent workspace you can customize.
 
