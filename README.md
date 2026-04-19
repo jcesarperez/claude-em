@@ -40,7 +40,7 @@ npm install -g @anthropic-ai/claude-code
 
 3. Add your team context:
 
-* Copy `data/team_example.md` → `data/team_myteam.md`
+* Copy `data/team_example.md` → `data/team_myteam.md`.
 * Fill in your team context and members
 
 4. Open Claude in your workspace:
@@ -56,6 +56,40 @@ claude
 6. Complete the full setup to unlock data-driven workflows (Jira, GitHub, and more)
 
 ---
+
+## Example use cases
+
+* Plan an initiative
+  > We have recurring CI flakiness slowing down delivery. Plan an initiative to reduce it
+
+* Analyze IC activity
+  > Analyze Maria's last 30 days
+
+* Prepare a 1:1
+  > Prepare a 1:1 with Ana. She’s delivering less lately and seems disengaged. I want to understand what's going on
+
+* Write a strategy
+  > Write a strategy to reduce operational load on the team while maintaining reliability
+
+* Mentor
+  > I'm considering reorganizing the team into two squads. Help me think through trade-offs and risks
+
+* Challenge my thinking
+  > I think we should invest in rewriting part of the system. Push back and help me validate this
+
+* Generate a user story map
+  > Generate a user story map from this PRD: [paste PRD]
+
+* Check an epic
+  > Check this epic
+
+* Write a delivery epic
+  > Write an epic to implement rate limiting in our API. Include scope, risks, and definition of done
+
+* Write a discovery epic
+  > We have performance issues in the frontend. Write a discovery epic to understand root causes and options
+ 
+ ---
 
 ## How it works
 
