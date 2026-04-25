@@ -107,7 +107,7 @@ claude
 | Skill | What it does |
 |---|---|
 | `/check-epic` | Analyze an Epic's definition, decomposition, and execution using Jira data |
-| `/ic-activity` | Analyze an IC's delivery, quality, and collaboration using Jira + GitHub data |
+| `/check-ic-activity` | Analyze an IC's delivery, quality, and collaboration using Jira + GitHub data |
 | `/jira` | Create and query Jira issues — epics, stories, bugs, and tasks |
 | `/mentor-me` | Think through a leadership situation with an Engineering Director mindset |
 | `/one-on-one` | Prepare for a 1:1 — situation read, key questions, risks, and opening line |

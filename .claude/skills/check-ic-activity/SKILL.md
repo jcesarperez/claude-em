@@ -1,5 +1,5 @@
 ---
-name: ic-activity
+name: check-ic-activity
 description: >
   Use this skill whenever the user wants to analyze the activity of an IC or engineer.
   You have access to a CLI tool that retrieves activity data for an IC from Jira and GitHub.
@@ -11,7 +11,7 @@ description: >
 Run this script using the Bash tool:
 
 ```
-bash .claude/skills/ic-activity/scripts/run_ic_activity.sh <github_username> <jira_email> <from_date> <to_date>
+bash .claude/skills/check-ic-activity/scripts/run_ic_activity.sh <github_username> <jira_email> <from_date> <to_date>
 ```
 
 - `github_username`: the user's GitHub handle (e.g. `jcesarperez-mews`)
