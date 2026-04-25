@@ -67,8 +67,15 @@ Then ask: *"Should I save these values in the skill so you don't have to enter t
 ### Jira CLI quick reference
 
 ```bash
-# Search / query
-jira issue list -p {{PROJECT_KEY}} --jql "<JQL>"
+# Search / query — using native flags (preferred for simple filters)
+jira issue list -p {{PROJECT_KEY}} -a "<email>" -s "<status>" -t <IssueType> \
+  --created-after "YYYY-MM-DD" --created-before "YYYY-MM-DD" \
+  --plain --columns KEY,SUMMARY,STATUS,ASSIGNEE,PRIORITY \
+  --paginate 0:100
+
+# Search / query — using raw JQL (for complex filters)
+# ⚠️ Do NOT include ORDER BY in the JQL string — the CLI adds it automatically and will return a 400 error if you include it
+jira issue list -p {{PROJECT_KEY}} --jql "<JQL without ORDER BY>"
 
 # Create issue
 jira issue create -p {{PROJECT_KEY}} -t <IssueType> -s "<summary>" [flags]
@@ -77,22 +84,25 @@ jira issue create -p {{PROJECT_KEY}} -t <IssueType> -s "<summary>" [flags]
 jira issue view <ISSUE-KEY>
 ```
 
+**Prefer native flags over `--jql` when the filter maps cleanly** (assignee, status, type, date range). Use `--jql` only for filters that have no native flag equivalent (e.g. `resolutiondate`, custom fields).
+
 ---
 
 ## A. Querying issues
 
-Identify the query intent and build the appropriate JQL. Always scope to `project = {{PROJECT_KEY}}`.
+Identify the query intent and build the appropriate query. Always scope to `project = {{PROJECT_KEY}}`.
 
 ### Common queries
 
-| User request | JQL |
+| User request | Preferred command |
 |---|---|
-| Epics in progress | `project = {{PROJECT_KEY}} AND issuetype = Epic AND status = "In Progress" ORDER BY updated DESC` |
-| Bugs open / in progress | `project = {{PROJECT_KEY}} AND issuetype = Bug AND status != Done ORDER BY priority ASC, duedate ASC` |
-| Issues completed last N days | `project = {{PROJECT_KEY}} AND status = Done AND resolutiondate >= -Nd ORDER BY resolutiondate DESC` |
-| Issues of type X in status Y | `project = {{PROJECT_KEY}} AND issuetype = X AND status = "Y" ORDER BY updated DESC` |
-| Bugs due in ≤ N days | `project = {{PROJECT_KEY}} AND issuetype = Bug AND duedate <= Nd AND status != Done ORDER BY duedate ASC` |
-| All open issues | `project = {{PROJECT_KEY}} AND status != Done ORDER BY updated DESC` |
+| Epics in progress | `jira issue list -p {{PROJECT_KEY}} -t Epic -s "In Progress" --plain --columns KEY,SUMMARY,STATUS,ASSIGNEE --paginate 0:100` |
+| Bugs open / in progress | `jira issue list -p {{PROJECT_KEY}} -t Bug --jql 'project = {{PROJECT_KEY}} AND "customfield_10001" = "82dc66a2-af52-404a-8663-a25bb3c10093" AND issuetype = Bug AND status != Done' --plain --paginate 0:100` |
+| Issues completed last N days | `jira issue list -p {{PROJECT_KEY}} --jql 'project = {{PROJECT_KEY}} AND "customfield_10001" = "82dc66a2-af52-404a-8663-a25bb3c10093" AND status = Done AND resolutiondate >= -Nd' --plain --paginate 0:100` |
+| Issues of type X in status Y | `jira issue list -p {{PROJECT_KEY}} -t X -s "Y" --plain --paginate 0:100` |
+| Bugs due in ≤ N days | `jira issue list -p {{PROJECT_KEY}} -t Bug --jql 'project = {{PROJECT_KEY}} AND "customfield_10001" = "82dc66a2-af52-404a-8663-a25bb3c10093" AND issuetype = Bug AND duedate <= Nd AND status != Done' --plain --paginate 0:100` |
+| All open issues | `jira issue list -p {{PROJECT_KEY}} --jql 'project = {{PROJECT_KEY}} AND "customfield_10001" = "82dc66a2-af52-404a-8663-a25bb3c10093" AND status != Done' --plain --paginate 0:100` |
+| Issues by assignee in date range | `jira issue list -p {{PROJECT_KEY}} -a "<email>" --created-after "YYYY-MM-DD" --plain --columns KEY,SUMMARY,STATUS,PRIORITY --paginate 0:100` |
 
 ### Output format for queries
 
