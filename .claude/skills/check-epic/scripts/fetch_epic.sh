@@ -245,11 +245,17 @@ METRICS_FILTER="${JQ_LIB}"'
 ((($epic.statusCategory == "To Do") and ($in_progress > 0 or $done > 0)) or
  (($epic.statusCategory == "Done") and ($in_progress > 0 or $todo > 0))) as $epic_status_stale |
 ($issues | map(select(.cycle_time != null) | .cycle_time.days)) as $cycle_time_vals |
-(if ($cycle_time_vals | length) > 0 then ($cycle_time_vals | add / length * 10 | round / 10) else null end) as $avg_cycle_time_days |
+(if ($cycle_time_vals | length) > 0 then
+  ($cycle_time_vals | sort) as $sorted |
+  ($sorted | length) as $n |
+  (if ($n % 2) == 1 then $sorted[($n / 2 | floor)]
+   else (($sorted[($n / 2) - 1] + $sorted[$n / 2]) / 2)
+   end) * 10 | round / 10
+else null end) as $median_cycle_time_days |
 ($issues | map(select(
     .cycle_time != null and
-    $avg_cycle_time_days != null and
-    .cycle_time.days > ($avg_cycle_time_days * 2) and
+    $median_cycle_time_days != null and
+    .cycle_time.days > ($median_cycle_time_days * 2) and
     .cycle_time.days > 5
   )) | map({key, summary, cycle_time_days: .cycle_time.days, cycle_time_formatted: .cycle_time.formatted})) as $high_cycle_time_issues |
 {
@@ -267,7 +273,7 @@ METRICS_FILTER="${JQ_LIB}"'
   unassigned_in_progress:  $unassigned_in_progress,
   days_until_due:          $days_until_due,
   epic_status_stale:       $epic_status_stale,
-  avg_cycle_time_days:     $avg_cycle_time_days,
+  median_cycle_time_days:  $median_cycle_time_days,
   high_cycle_time_issues:  $high_cycle_time_issues
 }
 '

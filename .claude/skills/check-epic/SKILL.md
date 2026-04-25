@@ -50,7 +50,7 @@ The script outputs JSON with this structure:
     "unassigned_in_progress": ["FBX-X"],
     "days_until_due": 0,
     "epic_status_stale": false,
-    "avg_cycle_time_days": 0.0,
+    "median_cycle_time_days": 0.0,
     "high_cycle_time_issues": [{ "key": "FBX-X", "summary": "...", "cycle_time_days": 0.0, "cycle_time_formatted": "Xd Yh Zm" }]
   },
   "child_issues": [
@@ -127,7 +127,7 @@ Evaluate issue list structure using summaries, types, and counts. Do NOT analyze
 | # | Criterion | What counts as ✅ |
 |---|---|---|
 | 1 | Coverage | Issue summaries collectively address all stated scope items; no major scope items untracked |
-| 2 | Granularity | Issues are roughly similar in scope; no oversized items (`num_subtasks > 5`); `avg_cycle_time_days ≤ 7` when available |
+| 2 | Granularity | Issues are roughly similar in scope; no oversized items (`num_subtasks > 5`); `median_cycle_time_days ≤ 7` when available |
 | 3 | Issue count | At least one issue per major scope item; not zero, not a single monolithic issue |
 
 **Score**:
@@ -155,10 +155,10 @@ Evaluate four signals, then derive overall state:
 **Unassigned in-progress** (use `metrics.unassigned_in_progress`):
 - Flag any in-progress issue with no owner — active work without an assignee is a delivery risk
 
-**Cycle time** (use `metrics.avg_cycle_time_days` and `metrics.high_cycle_time_issues`; skip entirely if null — not enough completed issues):
-- Healthy: `avg_cycle_time_days ≤ 5`
-- At Risk: `5 < avg_cycle_time_days ≤ 10`, or any `high_cycle_time_issues` (> 2× avg and > 5d)
-- Critical: `avg_cycle_time_days > 10`
+**Cycle time** (use `metrics.median_cycle_time_days` and `metrics.high_cycle_time_issues`; skip entirely if null — not enough completed issues):
+- Healthy: `median_cycle_time_days ≤ 5`
+- At Risk: `5 < median_cycle_time_days ≤ 10`, or any `high_cycle_time_issues` (> 2× avg and > 5d)
+- Critical: `median_cycle_time_days > 10`
 
 **Due date** (use `metrics.days_until_due` and `metrics.pct_done`):
 - Evaluate overdue cases first (`days_until_due < 0`):
@@ -192,7 +192,7 @@ Return ONLY this structure:
 - Assignees: X
 - Epic status: "Status" — in this status for Xd (since YYYY-MM-DD)[⚠️ Likely stale: X issues in progress/done but epic is "To Do"]
 - Closed last 7 days: X  |  Created last 7 days: X
-- Avg cycle time: X.Xd (N done issues)  |  Not enough data
+- Median cycle time: X.Xd (N done issues)  |  Not enough data
 - Due date: YYYY-MM-DD (X days remaining)  |  No due date set
 
 🧠 Definition Health — 🟢 / 🟡 / 🔴
@@ -217,8 +217,8 @@ Return ONLY this structure:
 - Bottlenecks: KEY stuck Xd, KEY stuck Xd (critical: KEY stuck Xd)  |  None
 - Blocked: X issues  |  None
 - Unassigned in-progress: KEY, KEY  |  None
-- Cycle time: X.Xd avg — 🟢 Healthy / 🟡 At Risk / 🔴 Critical  |  Not enough data
-- Cycle time outliers: KEY Xd (Xx avg), KEY Xd  |  None
+- Cycle time: X.Xd median — 🟢 Healthy / 🟡 At Risk / 🔴 Critical  |  Not enough data
+- Cycle time outliers: KEY Xd (Xx median), KEY Xd  |  None
 - Due date: YYYY-MM-DD (X days remaining) — 🟢 On Track / 🟡 At Risk / 🔴 Critical  |  YYYY-MM-DD (Xd overdue, work still open) — 🔴 Overdue  |  YYYY-MM-DD (Xd overdue, all issues done) — ⚠️ Past due, delivery timing unknown  |  No due date set
 - Key risks: bullet list
 - Likely causes: bullet list
