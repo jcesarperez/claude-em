@@ -1,5 +1,21 @@
 # Changelog
 
+## [v1.3.0] - 2026-04-26
+
+### Added
+- `check-issue` skill — Evaluate whether a Jira issue (Story, Bug, Task): execution health, ping pong detection, PR state, subtask movement
+- `README.md` — Example use cases
+
+### Changed
+- `check-epic` skill — Issue cycle time now uses median instead of average (`median_cycle_time_days`)
+- `ic-activity` skill renamed to `check-ic-activity` for consistency with other `check-*` skills
+
+### Fixed
+- `README.md` - `Check-epic` skill added to the skill list
+- `jira-fbx` skill — Removed `ORDER BY` from JQL examples (CLI adds it automatically; including it returns 400). Added native CLI flags (`-a`, `--created-after`, `--created-before`, `--paginate`) as preferred alternative to `--jql` for simple filters
+
+---
+
 ## [v1.2.0] - 2026-04-19
 
 ### Added
