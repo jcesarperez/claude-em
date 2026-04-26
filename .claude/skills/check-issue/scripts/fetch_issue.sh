@@ -116,28 +116,66 @@ PROJECT_KEY="${ISSUE_KEY%%-*}"
 STATUS_CATEGORIES_RAW=$(jira_get "/rest/api/3/project/${PROJECT_KEY}/statuses" 2>/dev/null || echo "[]")
 STATUS_CATEGORIES=$(echo "$STATUS_CATEGORIES_RAW" | jq '[.[] | .statuses[] | {(.name): .statusCategory.name}] | add // {}' 2>/dev/null || echo '{}')
 
-# Extract PR data from customfield_10000 (hybrid string format, not pure JSON)
-PR_DATA=$(echo "$ISSUE_RAW" | jq -r '.fields.customfield_10000 // ""' | python3 -c "
-import sys, re, json
-raw = sys.stdin.read()
-if not raw.strip():
+# Extract PR data via dev-status API (primary), customfield_10000 as aggregate fallback
+ISSUE_ID=$(echo "$ISSUE_RAW" | jq -r '.id // ""')
+PR_DATA="null"
+
+if [[ -n "$ISSUE_ID" && "$ISSUE_ID" != "null" ]]; then
+  DEV_STATUS=$(jira_get "/rest/dev-status/1.0/issue/detail?issueId=${ISSUE_ID}&applicationType=GitHub&dataType=pullrequest" 2>/dev/null || echo "{}")
+  PR_DATA=$(echo "$DEV_STATUS" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+except Exception:
     print('null')
     sys.exit(0)
-# Extract from outer format: pullrequest={state=X, stateCount=N, ...}
-state_m   = re.search(r'state=([A-Z_]+)',   raw)
-count_m   = re.search(r'stateCount=(\d+)',  raw)
-updated_m = re.search(r'lastUpdated\":\"([^\"]+)\"', raw)
+prs = [pr for detail in data.get('detail', []) for pr in detail.get('pullRequests', [])]
+if not prs:
+    print('null')
+    sys.exit(0)
+items = []
+for pr in prs:
+    status = pr.get('status', '').upper()
+    items.append({
+        'id':           pr.get('id', ''),
+        'title':        pr.get('name', ''),
+        'status':       status,
+        'open':         status == 'OPEN',
+        'author':       pr.get('author', {}).get('name', ''),
+        'branch':       pr.get('source', {}).get('branch', ''),
+        'last_updated': pr.get('lastUpdate'),
+        'url':          pr.get('url', ''),
+    })
+items.sort(key=lambda p: p.get('last_updated') or '', reverse=True)
+print(json.dumps({
+    'count':       len(items),
+    'open_count':  sum(1 for p in items if p['status'] == 'OPEN'),
+    'draft_count': sum(1 for p in items if p['status'] == 'DRAFT'),
+    'items':       items,
+}))
+" 2>/dev/null || echo "null")
+fi
+
+# Fallback: customfield_10000 aggregate (no individual PR data available)
+if [[ "$PR_DATA" == "null" ]]; then
+  PR_DATA=$(echo "$ISSUE_RAW" | jq -r '.fields.customfield_10000 // ""' | python3 -c "
+import sys, re, json
+raw = sys.stdin.read()
+state_m = re.search(r'\bpullrequest=\{[^}]*\bstate=([A-Z_]+)', raw)
+count_m = re.search(r'\bpullrequest=\{[^}]*\bstateCount=(\d+)', raw)
 if not state_m:
     print('null')
     sys.exit(0)
 state = state_m.group(1)
+count = int(count_m.group(1)) if count_m else 1
 print(json.dumps({
-    'count':        int(count_m.group(1)) if count_m else 1,
-    'state':        state,
-    'open':         state == 'OPEN',
-    'last_updated': updated_m.group(1) if updated_m else None,
+    'count':       count,
+    'open_count':  count if state == 'OPEN' else 0,
+    'draft_count': 0,
+    'items':       None,
 }))
 " 2>/dev/null || echo "null")
+fi
 
 # ---------------------------------------------------------------------------
 # Fetch subtasks (via JQL search with changelog, same pattern as fetch_epic.sh)
@@ -257,7 +295,18 @@ $raw.fields as $f |
   ),
   status_transitions: $status_transitions,
   assignee_changes: $assignee_changes,
-  pr: $pr
+  pr: $pr,
+  pr_merge_gap: (
+    if $pr != null then
+      ([$pr.items[]? | select(.status == "MERGED" and .last_updated != null) | .last_updated | parse_jira_date] | sort) as $merge_dates |
+      if ($merge_dates | length) >= 2 then
+        (($merge_dates[-1]) - ($merge_dates[0])) as $secs |
+        { seconds: ($secs | floor), formatted: ($secs | floor | format_duration) }
+      else null
+      end
+    else null
+    end
+  )
 }
 '
 

@@ -41,7 +41,24 @@ The script outputs JSON with this structure:
     "time_in_progress": { "formatted": "Xd Yh Zm", "seconds": 0 }, // In Progress issues only, or null
     "status_transitions": [{ "from": "...", "to": "...", "at": "...", "author": "Name" }],
     "assignee_changes": [{ "from": "...", "to": "...", "at": "...", "changed_by": "Name" }],
-    "pr": { "count": 1, "state": "OPEN", "open": true, "last_updated": "..." } // or null
+    "pr": {
+      "count": 2,
+      "open_count": 1,
+      "draft_count": 0,
+      "items": [                              // null if only aggregate data is available
+        {
+          "id": "#123",
+          "title": "fix: FBX-1234 ...",
+          "status": "OPEN",                   // OPEN | DRAFT | MERGED | DECLINED | CLOSED
+          "open": true,                       // true only when status == OPEN (ready for review)
+          "author": "Name",
+          "branch": "FBX-1234-my-branch",
+          "last_updated": "YYYY-MM-DDTHH:MM:SS.000+0000",
+          "url": "https://github.com/..."
+        }
+      ]
+    } // or null if no PRs found
+    "pr_merge_gap": { "formatted": "Xd Yh Zm", "seconds": 0 } // gap between first and last MERGED PR; null if < 2 merged PRs
   },
   "parent_epic": { "key": "FBX-1000", "summary": "...", "status": "In Development" }, // or null
   "subtasks": [
@@ -175,17 +192,40 @@ Report specific evidence: quote or paraphrase the comment and its author/date.
 
 #### PR Health
 
-Use `issue.pr` and `issue.time_in_current_status`:
+Use `issue.pr` and `issue.pr.items` (sorted by `last_updated` desc). Read the PR list to understand what happened: how many attempts, rework, drafts that never progressed, etc.
 
 | Situation | Signal |
 |---|---|
 | `status` contains "Review" AND `pr == null` | ⚠️ In review but no PR — status may be wrong |
-| `pr.open == true` AND last_updated > 3 days ago | 🟡 PR open but stale |
-| `pr.open == true` AND last_updated > 7 days ago | 🔴 PR open and very stale |
-| `pr.state == "MERGED"` AND `statusCategory != "Done"` | ⚠️ PR merged but issue still open — status stale |
+| `pr.open_count > 0` AND most recent open PR `last_updated` > 3 days ago | 🟡 PR open but stale |
+| `pr.open_count > 0` AND most recent open PR `last_updated` > 7 days ago | 🔴 PR open and very stale |
+| `pr.draft_count > 0` AND `statusCategory == "In Progress"` AND most recent draft `last_updated` > 5 days ago | 🟡 Draft stale — engineer may be blocked |
+| `pr.draft_count > 0` AND all other PRs are MERGED | ℹ️ Drafts never promoted — note but do not flag |
+| all PRs MERGED AND `statusCategory != "Done"` | ⚠️ All PRs merged but issue still open — status stale |
+| `pr.count > 2` AND multiple DECLINED or many attempts | ⚠️ Rework signal — investigate why |
 | `statusCategory == "In Progress"` AND `pr == null` | ℹ️ No PR yet — expected if early in-progress |
 
 Skip PR analysis if `pr == null` and status is not review-related.
+
+#### Cycle Time Signal
+
+Use `issue.cycle_time.seconds` (Done issues) or `issue.time_in_progress.seconds` (In Progress issues). Apply to both Done and In Progress; ignore To Do.
+
+| Elapsed | Signal |
+|---|---|
+| > 30 days (2,592,000s) | 🔴 Very long cycle time — investigate delivery pace |
+| > 15 days (1,296,000s) | 🟡 Getting long — monitor |
+| ≤ 15 days | 🟢 OK |
+
+#### PR Merge Gap Signal
+
+Use `issue.pr_merge_gap.seconds`. Skip if `pr_merge_gap == null` (fewer than 2 merged PRs).
+
+| Gap between first and last MERGED PR | Signal |
+|---|---|
+| > 14 days (1,209,600s) | 🔴 Large gap — delivery stretched, likely paused or blocked mid-way |
+| > 7 days (604,800s) | 🟡 Noticeable gap — work spread across multiple cycles |
+| ≤ 7 days | 🟢 OK |
 
 #### Subtask Execution
 
@@ -200,9 +240,9 @@ Use `subtasks` array:
 
 #### Overall Execution State
 
-- 🟢 Moving: within stuck threshold, no ping pong, PR healthy (or not applicable), subtasks progressing
-- 🟡 At Risk: approaching threshold (>50% of limit), minor ping pong signs, PR open but not stale, 1 subtask stuck
-- 🔴 Stuck: exceeded stuck threshold, OR `pingpong.detected == true` OR clear unanswered blocking question, OR `assignee == null` in progress, OR PR very stale, OR all subtasks blocked
+- 🟢 Moving: within stuck threshold, no ping pong, PR healthy (or not applicable), subtasks progressing, cycle time ≤ 15d, PR merge gap ≤ 7d
+- 🟡 At Risk: approaching threshold (>50% of limit), minor ping pong signs, PR open but not stale, 1 subtask stuck, cycle time > 15d, OR PR merge gap > 7d
+- 🔴 Stuck: exceeded stuck threshold, OR `pingpong.detected == true` OR clear unanswered blocking question, OR `assignee == null` in progress, OR PR very stale, OR all subtasks blocked, OR cycle time > 30d, OR PR merge gap > 14d
 
 ---
 
@@ -219,7 +259,8 @@ Return ONLY this structure:
 - Progress: First in progress YYYY-MM-DD · Cycle time Xd Yh (Done) | In progress Xd Yh total (In Progress) | — (To Do / never started)
 - Assignee: Name  |  ⚠️ Unassigned
 - Priority: High / Medium / Low / —
-- PR: OPEN (1) last updated Xd ago  |  MERGED  |  No PRs
+- PRs: 3 total · 1 OPEN · 1 DRAFT · 1 MERGED (last activity YYYY-MM-DD)  |  No PRs
+  (list each PR on its own line if ≤ 4 total: "  · #123 MERGED — branch-name — author (YYYY-MM-DD)")
 - Parent: KEY — Epic Summary [Epic Status]  |  No parent
 - Subtasks: X total (X Done · X In Progress · X To Do)  |  None
 - Comments: X
@@ -239,6 +280,8 @@ Return ONLY this structure:
 - Status time: Xd in "Status" — 🟢 OK / 🟡 Approaching / 🔴 Stuck (threshold: Xd)
 - Ping pong: 🔴 Detected / 🟡 Signals present / 🟢 None
   - Evidence: "[quote or paraphrase]" — Author (date)  |  None
+- Cycle time: Xd total — 🟢 OK / 🟡 Long (>15d) / 🔴 Very long (>30d)  |  — (To Do)
+- PR merge gap: Xd between first and last merge — 🟢 OK / 🟡 Spread (>7d) / 🔴 Large (>14d)  |  N/A
 - PR: state — assessment  |  No PR
 - Subtasks: X moving / KEY stuck Xd / all Done but issue open  |  None
 - Assignee: ✅ Assigned / 🔴 Unassigned while In Progress
