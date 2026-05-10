@@ -70,17 +70,27 @@ gh search commits \
   --json commit \
   > "$OUT_DIR/commits.json"
 
-# --- Jira issues completed ---
-jira issue list \
-  -q "assignee = \"$JIRA_EMAIL_USER\" AND status = Done AND resolved >= \"$FROM\" AND resolved <= \"$TO\" AND issuetype != Epic" \
-  --raw --paginate 0:100 \
-  > "$OUT_DIR/issues.json" 2>/dev/null || echo "[]" > "$OUT_DIR/issues.json"
+# --- Jira issues completed (cross-project via REST API) ---
+curl -s -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+  -X POST "${JIRA_URL}/rest/api/3/search/jql" \
+  -H "Content-Type: application/json" \
+  --data-binary "{
+    \"jql\": \"assignee = \\\"$JIRA_EMAIL_USER\\\" AND status = Done AND resolutiondate >= \\\"$FROM\\\" AND resolutiondate <= \\\"$TO\\\" AND issuetype != Epic\",
+    \"maxResults\": 100,
+    \"fields\": [\"key\",\"issuetype\",\"resolutiondate\",\"status\"]
+  }" \
+  | jq '.issues // []' > "$OUT_DIR/issues.json" 2>/dev/null || echo "[]" > "$OUT_DIR/issues.json"
 
-# --- Jira issues in progress (WIP) ---
-jira issue list \
-  -q "assignee = \"$JIRA_EMAIL_USER\" AND status = 'In Progress' AND issuetype != Epic" \
-  --raw --paginate 0:100 \
-  > "$OUT_DIR/issues_wip.json" 2>/dev/null || echo "[]" > "$OUT_DIR/issues_wip.json"
+# --- Jira issues in progress / WIP (cross-project, all non-Done statuses) ---
+curl -s -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+  -X POST "${JIRA_URL}/rest/api/3/search/jql" \
+  -H "Content-Type: application/json" \
+  --data-binary "{
+    \"jql\": \"assignee = \\\"$JIRA_EMAIL_USER\\\" AND statusCategory = 'In Progress' AND issuetype != Epic\",
+    \"maxResults\": 100,
+    \"fields\": [\"key\",\"issuetype\",\"status\"]
+  }" \
+  | jq '.issues // []' > "$OUT_DIR/issues_wip.json" 2>/dev/null || echo "[]" > "$OUT_DIR/issues_wip.json"
 
 # --- Metrics ---
 PRS=$(jq length "$OUT_DIR/prs.json")
@@ -91,8 +101,8 @@ ISSUES=$(jq 'if type == "array" then length else 0 end' "$OUT_DIR/issues.json")
 # issues by type
 ISSUES_BY_TYPE=$(jq '
   if type == "array" then
-    group_by(.fields.issueType.name)
-    | map({ (.[0].fields.issueType.name): length })
+    group_by(.fields.issuetype.name)
+    | map({ (.[0].fields.issuetype.name): length })
     | add // {}
   else {} end
 ' "$OUT_DIR/issues.json")
