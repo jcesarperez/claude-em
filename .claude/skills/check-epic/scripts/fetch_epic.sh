@@ -149,13 +149,13 @@ def time_in_current_status($current_status; $created; $now):
     since: $since
   };
 
-# Cycle time for completed issues: first transition to "In Progress" → last transition to "Done"
+# Cycle time for completed issues: first transition to "In Progress" category → last transition to "Done" category
 # Input: full issue JSON (with changelog at top level). Returns null if not yet Done.
-def cycle_time_of_issue:
+def cycle_time_of_issue($status_categories):
   (.changelog.histories // []) as $h |
-  ($h | map(select(any(.items[]?; .field == "status" and .toString == "In Progress")))
+  ($h | map(select(any(.items[]?; .field == "status" and ($status_categories[.toString] == "In Progress"))))
       | sort_by(.created) | .[0] | .created) as $ip |
-  ($h | map(select(any(.items[]?; .field == "status" and .toString == "Done")))
+  ($h | map(select(any(.items[]?; .field == "status" and ($status_categories[.toString] == "Done"))))
       | sort_by(.created) | .[-1] | .created) as $done |
   if ($ip != null and $done != null) then
     (($done | parse_jira_date) - ($ip | parse_jira_date)) as $secs |
@@ -214,7 +214,7 @@ $issue.fields as $f |
   created: ($f.created // ""),
   updated: ($f.updated // ""),
   time_in_current_status: (. | time_in_current_status($f.status.name; $f.created; $now)),
-  cycle_time: cycle_time_of_issue
+  cycle_time: cycle_time_of_issue($status_categories)
 }
 '
 
@@ -291,6 +291,14 @@ if [[ "$ISSUETYPE" != "Epic" ]]; then
   exit 1
 fi
 
+# Fetch status category map for this project: { "status name": "category name", ... }
+PROJECT_KEY="${EPIC_KEY%%-*}"
+STATUS_CATEGORIES_RAW=$(curl -s -f \
+  -u "${JIRA_EMAIL}:${JIRA_TOKEN}" \
+  -H "Accept: application/json" \
+  "${JIRA_URL}/rest/api/3/project/${PROJECT_KEY}/statuses" 2>/dev/null || echo "[]")
+STATUS_CATEGORIES=$(echo "$STATUS_CATEGORIES_RAW" | jq '[.[] | .statuses[] | {(.name): .statusCategory.name}] | add // {}' 2>/dev/null || echo '{}')
+
 NOW=$(date -u +%s)
 
 EPIC=$(echo "$EPIC_RAW" | jq --argjson now "$NOW" "$EPIC_FILTER")
@@ -301,7 +309,7 @@ EPIC=$(echo "$EPIC_RAW" | jq --argjson now "$NOW" "$EPIC_FILTER")
 echo "Fetching child issues for ${EPIC_KEY}..." >&2
 CHILDREN_RAW=$(fetch_children "$EPIC_KEY")
 
-CHILDREN_JSON=$(echo "$CHILDREN_RAW" | jq --argjson now "$NOW" \
+CHILDREN_JSON=$(echo "$CHILDREN_RAW" | jq --argjson now "$NOW" --argjson status_categories "$STATUS_CATEGORIES" \
   "[.[] | ${CHILD_FILTER}]")
 
 METRICS=$(jq -n \
