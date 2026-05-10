@@ -26,6 +26,7 @@ claude-em/
 ├── data/                       # Shared data across initiatives
 │   ├── team_{name}.md          # Team context files
 │   ├── [source]/               # One folder per data source (jira, github, etc.)
+│   │   └── scripts/            # Extraction scripts for that source
 │   └── tmp/                    # Temporary files not tied to any initiative
 └── [initiative-name]/          # One folder per initiative
     ├── data/                   # Initiative-specific data
@@ -34,7 +35,12 @@ claude-em/
     └── output/                 # Reports and analysis results
 ```
 
-- Team context files (`data/team_{name}.md`) follow the template in `data/team_example.md` — always read the relevant file when a team member is mentioned or their data is needed
+- Team context files (`data/team_{name}.md`) follow the template in `data/team_example.md`. Always read the relevant team file when:
+  - a team member is mentioned (by nickname, full name, email or GitHub username)
+  - the team itself is referenced ("Events team", "equipo Floor", "our board", etc.)
+  - any skill needs team-specific context (default Jira project, default board, repos, conventions)
+
+  If the team is ambiguous or not referenced, ask the user which team applies.
 
 ## Using Tools
 
