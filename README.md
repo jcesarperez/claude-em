@@ -74,8 +74,8 @@ claude
 * Mentor
   > I'm considering reorganizing the team into two squads. Help me think through trade-offs and risks
 
-* Challenge my thinking
-  > I think we should invest in rewriting part of the system. Push back and help me validate this
+* Prepare the daily meeting
+  > Give me a daily-ready view of the team's board
 
 * Generate a user story map
   > Generate a user story map from this PRD: [paste PRD]
@@ -106,6 +106,7 @@ claude
 
 | Skill | What it does |
 |---|---|
+| `/check-board` | Daily health check of a Jira Kanban board: flow, people load, stuck/blocked issues, and bugs at risk of breaching SLA |
 | `/check-epic` | Analyze an Epic's definition, decomposition, and execution using Jira data |
 | `/check-ic-activity` | Analyze an IC's delivery, quality, and collaboration using Jira + GitHub data |
 | `/jira` | Create and query Jira issues — epics, stories, bugs, and tasks |

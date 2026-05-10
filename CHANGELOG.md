@@ -1,5 +1,22 @@
 # Changelog
 
+## [v1.4.0] - 2026-05-10
+
+### Added
+- `check-board` skill — Evaluate the daily health of a Jira Kanban board: flow, people load, blocked/stuck issues, idle assignees, and bugs at risk of breaching SLA.
+
+### Changed
+- `CLAUDE.md` — Team context file trigger broadened: team files are now read whenever the team itself is referenced or a skill needs team-specific context (default Jira project, default board, repos, conventions), not only when a team member is mentioned
+- `data/team_example.md` — Restructured Jira section: replaced the thin `## Jira Projects` block with a `## Jira` section that captures default project key, default board (id + URL), Jira skill to use, and a list of team-specific conventions; optional `Other projects` subsection for additional keys
+
+### Fixed
+- `check-ic-activity` skill — Jira queries now use the REST API (`POST /rest/api/3/search/jql`) instead of the `jira` CLI, which was defaulting to the configured project (FBX) and silently excluding issues from other projects (e.g. OPS)
+- `check-ic-activity` skill — Fixed Jira issues completed query: replaced `resolved` with `resolutiondate` (correct field name in Jira API)
+- `check-ic-activity` skill — WIP query now uses `statusCategory = 'In Progress'` instead of `status = 'In Progress'`, capturing all active statuses (Testing, Preparation, etc.) across projects
+- `check-epic` skill — Cycle time now uses status categories instead of hardcoded status names ("In Progress", "Done"), fixing incorrect `null` cycle times for issues in projects with custom status names
+
+---
+
 ## [v1.3.0] - 2026-04-26
 
 ### Added
