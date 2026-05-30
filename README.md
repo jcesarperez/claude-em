@@ -38,10 +38,10 @@ Works out of the box with **Jira** and **GitHub**. Other tools can be added via 
 npm install -g @anthropic-ai/claude-code
 ```
 
-3. Add your team context:
+3. Add your EM style and team context:
 
-* Copy `data/team_example.md` → `data/team_myteam.md`.
-* Fill in your team context and members
+* Copy `data/em_style_example.md` → `data/em_style.md` and fill in your style
+* Copy `data/team_example.md` → `data/team_myteam.md` and fill in your team and members
 
 4. Open Claude in your workspace:
 
@@ -93,7 +93,8 @@ claude
 
 ## How it works
 
-* **CLAUDE.md** defines your personal EM style and how Claude should behave
+* **CLAUDE.md** defines how Claude should behave
+* **EM style** (`data/em_style.md`) defines your personal way of working
 * **Skills** (`.claude/skills/`) are reusable prompts for real EM tasks
 * **Team context** (`data/team_*.md`) defines your team
 * **Data** (`data/`) stores shared information (Jira, GitHub, etc.)
@@ -127,6 +128,7 @@ claude
 ```
 claude-em/
 ├── data/                       # Shared data across initiatives
+│   ├── em_style.md             # Engineering Manager style
 │   ├── team_{name}.md          # Team context files
 │   ├── [source]/               # One folder per data source (jira, github, etc.)
 │   └── tmp/                    # Temporary files
@@ -162,11 +164,10 @@ npm install -g @anthropic-ai/claude-code
 
 ### 3. Configure your EM profile
 
-Edit `CLAUDE.md` and define:
+Define your EM style:
 
-* Your EM style
-* Your expectations from Claude
-* Your way of working
+* Copy `data/em_style_example.md` → `data/em_style.md`
+* Fill in your style and how you want Claude to respond
 
 Then create your team context:
 
