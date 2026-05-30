@@ -3,6 +3,7 @@
 ## [v2.0.0] - 2026-0x-xx
 
 ### Added
+- EM style moved out of `CLAUDE.md` into `data/em_style.md` (with `data/em_style_example.md` as the template), so version updates to `CLAUDE.md` no longer conflict with each user's personal style. `CLAUDE.md` now reads `data/em_style.md` and falls back to asking the EM if it's missing or empty
 - `CLAUDE.md` — New `## Initiatives` section with explicit behavioral guidance: create `initiatives/<initiative-name>/` (kebab-case) for new work, create sub-folders (`data/`, `tmp/`, `scripts/`, `output/`) only as needed, read/write within the referenced initiative, and ask when it's ambiguous
 - `CLAUDE.md` — New `## Team Context` section: promoted team guidance from the Folder Structure block into its own section (parallel to Initiatives), adding how to create a new team (copy `data/team_example.md` to `data/team_{name}.md`) alongside the existing "when to read" triggers
 
