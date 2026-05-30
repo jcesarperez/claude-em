@@ -28,11 +28,12 @@ claude-em/
 │   ├── [source]/               # One folder per data source (jira, github, etc.)
 │   │   └── scripts/            # Extraction scripts for that source
 │   └── tmp/                    # Temporary files not tied to any initiative
-└── [initiative-name]/          # One folder per initiative
-    ├── data/                   # Initiative-specific data
-    ├── tmp/                    # Initiative-specific temporary files
-    ├── scripts/                # Analysis and processing scripts
-    └── output/                 # Reports and analysis results
+└── initiatives/                # All initiatives live here
+    └── {initiative-name}/      # One folder per initiative
+        ├── data/               # Initiative-specific data
+        ├── tmp/                # Initiative-specific temporary files
+        ├── scripts/            # Analysis and processing scripts
+        └── output/             # Reports and analysis results
 ```
 
 - Team context files (`data/team_{name}.md`) follow the template in `data/team_example.md`. Always read the relevant team file when:
@@ -41,6 +42,16 @@ claude-em/
   - any skill needs team-specific context (default Jira project, default board, repos, conventions)
 
   If the team is ambiguous or not referenced, ask the user which team applies.
+
+## Initiatives
+
+An initiative is a self-contained piece of work (analysis, planning, reports, etc.) that lives in its own folder under `initiatives/`.
+
+- Not all work needs an initiative. Only create one when the user explicitly asks for it, or when producing an output file/artifact worth persisting
+- To create one, make a folder `initiatives/<initiative-name>/` using a short, descriptive **kebab-case** name (e.g. `cursor-usage`, `operational-excellence`)
+- Create the `data/`, `tmp/`, `scripts/`, and `output/` sub-folders only as needed — they are not mandatory scaffolding
+- When the user references an existing initiative, read and write within that folder; keep related files together and don't scatter them elsewhere
+- If it's ambiguous whether work belongs in an initiative or which one, ask the user
 
 ## Using Tools
 

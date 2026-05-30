@@ -97,7 +97,7 @@ claude
 * **Skills** (`.claude/skills/`) are reusable prompts for real EM tasks
 * **Team context** (`data/team_*.md`) defines your team
 * **Data** (`data/`) stores shared information (Jira, GitHub, etc.)
-* **Initiatives** are folders where work, analysis, and outputs live
+* **Initiatives** (`initiatives/`) are folders where work, analysis, and outputs live
 * **CLI-first approach**: prefers CLI tools over MCP servers to stay fast, predictable, and low-cost in terms of tokens
 
 ---
@@ -130,11 +130,12 @@ claude-em/
 │   ├── team_{name}.md          # Team context files
 │   ├── [source]/               # One folder per data source (jira, github, etc.)
 │   └── tmp/                    # Temporary files
-└── [initiative-name]/          # One folder per initiative
-    ├── data/                   # Initiative-specific data
-    ├── tmp/                    # Temporary files
-    ├── scripts/                # Analysis and processing
-    └── output/                 # Results and reports
+└── initiatives/                # All initiatives live here
+    └── {initiative-name}/      # One folder per initiative
+        ├── data/               # Initiative-specific data
+        ├── tmp/                # Temporary files
+        ├── scripts/            # Analysis and processing
+        └── output/             # Results and reports
 ```
 
 ---

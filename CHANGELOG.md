@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.0.0] - 2026-0x-xx
+
+### Added
+- `CLAUDE.md` — New `## Initiatives` section with explicit behavioral guidance: create `initiatives/<initiative-name>/` (kebab-case) for new work, create sub-folders (`data/`, `tmp/`, `scripts/`, `output/`) only as needed, read/write within the referenced initiative, and ask when it's ambiguous
+
+### Changed
+- Workspace structure — All initiatives now live under a top-level `initiatives/` folder instead of sitting at the workspace root. `data/` and `.claude/` remain at the root.
+- `CLAUDE.md` — Updated the folder structure diagram to nest `[initiative-name]/` under `initiatives/`
+- `README.md` — Updated the workspace structure diagram and the "How it works" section to reflect the new `initiatives/` folder
+
+---
+
 ## [v1.4.0] - 2026-05-10
 
 ### Added
