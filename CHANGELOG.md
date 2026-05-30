@@ -3,6 +3,10 @@
 ## [v2.0.0] - 2026-0x-xx
 
 ### Added
+- `one-on-one` skill — New optional context for richer 1:1 prep: a per-person living doc and team-level career frameworks, both pulled in automatically from the team file. The skill now resolves the person/team, opens the per-person doc when present, and loads the matching career framework only when the conversation is about expectations or growth. All optional — if a link is missing or unreachable, the skill ignores it and works as before (still asks 3 clarifying questions). The skill adapts to whatever the doc contains and does not expect a fixed structure
+- `one-on-one` skill — Added `references/person-file-example.md`, a suggested (not required) starting point for a per-person 1:1 doc
+- `data/team_example.md` — New optional `## Career Frameworks` section (links per level) and a per-member `1:1 file:` field, both consumed by the `one-on-one` skill
+- `README.md` — New optional setup step "Get the most out of 1:1s" explaining the per-person doc and career framework links
 - EM style moved out of `CLAUDE.md` into `data/em_style.md` (with `data/em_style_example.md` as the template), so version updates to `CLAUDE.md` no longer conflict with each user's personal style. `CLAUDE.md` now reads `data/em_style.md` and falls back to asking the EM if it's missing or empty
 - `CLAUDE.md` — New `## Initiatives` section with explicit behavioral guidance: create `initiatives/<initiative-name>/` (kebab-case) for new work, create sub-folders (`data/`, `tmp/`, `scripts/`, `output/`) only as needed, read/write within the referenced initiative, and ask when it's ambiguous
 - `CLAUDE.md` — New `## Team Context` section: promoted team guidance from the Folder Structure block into its own section (parallel to Initiatives), adding how to create a new team (copy `data/team_example.md` to `data/team_{name}.md`) alongside the existing "when to read" triggers
@@ -11,6 +15,7 @@
 - Workspace structure — All initiatives now live under a top-level `initiatives/` folder instead of sitting at the workspace root. `data/` and `.claude/` remain at the root.
 - `CLAUDE.md` — Updated the folder structure diagram to nest `[initiative-name]/` under `initiatives/`
 - `README.md` — Updated the workspace structure diagram and the "How it works" section to reflect the new `initiatives/` folder
+- `CLAUDE.md` — Trimmed the `## Behavior` section: removed the English-output rule (now owned by `data/em_style.md`) and the "only use data files the user explicitly references — never look for data on your own" rule (it contradicted the new Team Context and Initiatives sections, which read those files proactively)
 
 ---
 

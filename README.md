@@ -266,6 +266,21 @@ claude mcp add --plugin figma
 
 ---
 
+### 8. (Optional) Get the most out of 1:1s
+
+The `/one-on-one` skill works with nothing but a one-line prompt, but it gets sharper the more context you give it through the team file.
+
+**Per-person 1:1 doc.** Give any member a living doc and the skill will read it when preparing the conversation — open topics, agreed actions, signals to watch, goals, and what happened in past 1:1s:
+
+* Add a `1:1 file:` link to the member in `data/team_{your-team}.md`
+* The value can be a URL or a path, and the doc can be in **any format** — the skill adapts to whatever's there
+* For a suggested starting point, see `.claude/skills/one-on-one/references/person-file-example.md`
+* It's fully optional: if it's missing or unreachable, the skill simply ignores it
+
+**Career Frameworks.** Fill in the `## Career Frameworks` section of the team file with links (per level) to your expectations docs. The skill reads the one matching the member's seniority when the conversation turns to expectations or growth.
+
+---
+
 ## Notes
 
 * You don’t need full setup to start — Quick Start is enough
