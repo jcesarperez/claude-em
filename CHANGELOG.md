@@ -4,6 +4,7 @@
 
 ### Added
 - `CLAUDE.md` — New `## Initiatives` section with explicit behavioral guidance: create `initiatives/<initiative-name>/` (kebab-case) for new work, create sub-folders (`data/`, `tmp/`, `scripts/`, `output/`) only as needed, read/write within the referenced initiative, and ask when it's ambiguous
+- `CLAUDE.md` — New `## Team Context` section: promoted team guidance from the Folder Structure block into its own section (parallel to Initiatives), adding how to create a new team (copy `data/team_example.md` to `data/team_{name}.md`) alongside the existing "when to read" triggers
 
 ### Changed
 - Workspace structure — All initiatives now live under a top-level `initiatives/` folder instead of sitting at the workspace root. `data/` and `.claude/` remain at the root.

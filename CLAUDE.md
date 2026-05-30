@@ -36,12 +36,16 @@ claude-em/
         └── output/             # Reports and analysis results
 ```
 
-- Team context files (`data/team_{name}.md`) follow the template in `data/team_example.md`. Always read the relevant team file when:
-  - a team member is mentioned (by nickname, full name, email or GitHub username)
-  - the team itself is referenced ("Events team", "equipo Floor", "our board", etc.)
-  - any skill needs team-specific context (default Jira project, default board, repos, conventions)
+## Team Context
 
-  If the team is ambiguous or not referenced, ask the user which team applies.
+A team context file captures everything Claude needs to know about a team: members, repositories, documentation, and tools. These files live in `data/` as `team_{name}.md` (e.g. `team_abc.md`).
+
+- Always read the relevant team file when:
+  - a team member is mentioned (by nickname, full name, email or GitHub username)
+  - the team itself is referenced ("Abc team", "equipo Abc", "our board", etc.)
+  - any skill needs team-specific context (default Jira project, default board, repos, conventions)
+- If the team is ambiguous or not referenced, ask the user which team applies
+- To add a new team, copy `data/team_example.md` to `data/team_{name}.md` (kebab-case `{name}`) and fill it in
 
 ## Initiatives
 
