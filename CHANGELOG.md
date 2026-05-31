@@ -1,6 +1,24 @@
 # Changelog
 
-## [v2.0.0] - 2026-0x-xx
+## [v2.0.0] - 2026-05-31
+
+> **First breaking release.** If you're upgrading from v1.x, follow the migration steps below before opening Claude.
+
+### Breaking Changes
+
+Two structural changes require manual migration if you have an existing workspace.
+
+**1. Initiatives moved to `initiatives/`**
+
+All initiative folders now live under a top-level `initiatives/` directory instead of the workspace root. Move any existing initiative folders there.
+
+If you have no initiative folders yet, nothing to do.
+
+**2. EM style moved out of `CLAUDE.md`**
+
+Your personal style is no longer written directly in `CLAUDE.md` — it now lives in `data/em_style.md`. Copy `data/em_style_example.md` to `data/em_style.md` and fill it in. If you had customized `CLAUDE.md` with your style, move that content there.
+
+---
 
 ### Added
 - `one-on-one` skill — New optional context for richer 1:1 prep: a per-person living doc and team-level career frameworks, both pulled in automatically from the team file. The skill now resolves the person/team, opens the per-person doc when present, and loads the matching career framework only when the conversation is about expectations or growth. All optional — if a link is missing or unreachable, the skill ignores it and works as before (still asks 3 clarifying questions). The skill adapts to whatever the doc contains and does not expect a fixed structure
