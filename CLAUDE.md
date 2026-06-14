@@ -51,6 +51,21 @@ An initiative is a self-contained piece of work (analysis, planning, reports, et
 - When the user references an existing initiative, read and write within that folder; keep related files together and don't scatter them elsewhere
 - If it's ambiguous whether work belongs in an initiative or which one, ask the user
 
+## Credentials
+
+Tokens, API keys, and passwords live in `.env.local` at the workspace root (git-ignored). Always load it before making authenticated requests:
+
+```bash
+set -a; source .env.local; set +a
+```
+
+Current variables:
+- `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` — Atlassian (Jira, Confluence, Atlas GraphQL)
+- `GITHUB_TOKEN` — GitHub API
+- `FIGMA_TOKEN` — Figma API
+
+Never ask the user for credentials. Never search the keychain or config files. If a credential is missing from `.env.local`, tell the user which variable to add.
+
 ## Using Tools
 
 **Always prefer CLI and bash over MCP tools.** This saves tokens and keeps interactions fast and reproducible. This rule applies at all times, including when executing skills.
@@ -58,9 +73,10 @@ An initiative is a self-contained piece of work (analysis, planning, reports, et
 Priority order:
 1. **Jira skills** — for any Jira interaction, use the `jira` skill or a project-specific variant (`jira-xxx`, where `xxx` is the Jira project key). The project-specific skill encodes the correct fields and logic for that project. Use `jira` as the generic fallback if no project-specific skill exists.
 2. **CLI tools** (`jira`, `gh`) — use directly only if no skill covers the project.
-3. **Bash scripts** using CLI tools or REST APIs
+3. **Bash scripts** using CLI tools or REST APIs (sourcing `.env.local` for credentials)
 4. **MCP tools** — only when CLI/bash is not feasible, or the user explicitly asks for it
 
 When a skill needs to perform a Jira action, it must invoke the appropriate project skill (e.g. `jira`, or `jira-xxx`) rather than calling MCP tools directly. Skills can and should call other skills.
 
 If a required CLI is not installed, suggest how to install and configure it before proceeding.
+
