@@ -264,6 +264,18 @@ claude mcp add --plugin github
 claude mcp add --plugin figma
 ```
 
+**Slack (MCP only)**
+
+Slack has no practical CLI, so reading channels/threads is done through MCP. Add the official Slack connector and authenticate with your account:
+
+```bash
+claude mcp add --transport http slack https://mcp.slack.com/mcp
+```
+
+> Note: Slack access depends on your channel/workspace permissions. DMs are not readable, and the history tools ignore date filters — Claude pulls recent messages and filters the window itself.
+
+**Tip:** record your team's key Slack channels in `data/team_{name}.md` so Claude knows where to look (e.g. an `## Slack` section listing channel names). Otherwise it has to search and ask which channels apply.
+
 ---
 
 ### 8. (Optional) Get the most out of 1:1s
