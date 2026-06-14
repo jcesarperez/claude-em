@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.1.0] - 2026-06-xx
+## [v2.1.0] - 2026-06-14
 
 ### Added
 - `CLAUDE.md` — New `## Credentials` section documenting `.env.local` as the single source for all tokens (`JIRA_API_TOKEN`, `GITHUB_TOKEN`, `FIGMA_TOKEN`). Explicit rule: never ask the user for credentials, never search the keychain or config files
