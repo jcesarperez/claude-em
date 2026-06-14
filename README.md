@@ -88,7 +88,11 @@ claude
 
 * Write a discovery epic
   > We have performance issues in the frontend. Write a discovery epic to understand root causes and options
- 
+
+* Write a weekly update
+  > Write the weekly update for the platform team
+  > Write the project update for the migration initiative
+
  ---
 
 ## How it works
@@ -118,6 +122,7 @@ claude
 | `/write-epic-build` | Write a delivery epic with scope, risks, and definition of done |
 | `/write-epic-technical-discovery` | Write a discovery epic focused on reducing uncertainty and enabling a decision |
 | `/write-strategy` | Draft a strategy doc (Rumelt + Larson) with diagnosis, policies, and actions |
+| `/write-update` | Write a periodic update (weekly, monthly) by pulling Jira, Slack, and URL sources and formatting the output with a chosen template |
 | `/write-us` | Draft a user story following INVEST and vertical slicing |
 | `/write-vision` | Draft a vision doc with value proposition, capabilities, and constraints |
 
@@ -290,6 +295,25 @@ The `/one-on-one` skill works with nothing but a one-line prompt, but it gets sh
 * It's fully optional: if it's missing or unreachable, the skill simply ignores it
 
 **Career Frameworks.** Fill in the `## Career Frameworks` section of the team file with links (per level) to your expectations docs. The skill reads the one matching the member's seniority when the conversation turns to expectations or growth.
+
+---
+
+### 9. (Optional) Configure `/write-update`
+
+The `/write-update` skill writes periodic team or project updates by pulling data from Jira, Slack, and configured URLs. It works out of the box with a one-line prompt, but gets significantly better with two things set up in the team file.
+
+**Templates.** The skill ships with two built-in templates in `.claude/skills/write-update/assets/`:
+
+| Template | Purpose |
+|---|---|
+| `weekly_team_update.md` | Weekly update for the whole org — highlights, lowlights, pipeline, metrics, allocation |
+| `weekly_project_update.md` | Status update for a specific project or initiative — status indicator, highlights, lowlights, upcoming |
+
+You can create your own templates by adding `.md` files to that same `assets/` folder. When you invoke the skill without specifying a template, Claude lists the available ones and asks you to choose. Each template can include an `## Instructions` section to tell the skill which sources to query and how to scope the data.
+
+**Update Sources.** Add an `## Update Sources` section to `data/team_{your-team}.md` listing the URLs Claude should read — Confluence meeting notes, Atlas project pages, and so on. The skill fetches each URL in parallel and extracts relevant content for the date range.
+
+**Slack channels.** Add a `## Slack` section to the team file with the channel names to include in each update. Claude reads them in parallel and filters for signal (shipped work, decisions, risks, customer feedback).
 
 ---
 

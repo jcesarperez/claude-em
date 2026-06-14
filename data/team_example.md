@@ -5,11 +5,12 @@
 - Team name: Example
 - Notes:
   - <e.g. "Platform team">
-  - <e.g. "Core team">
+  - <e.g. "Owns A, B, C">
 
 ## Repositories
 
-- URL: GITHUB_URL
+- Project_name: <GITHUB_URL>
+- <e.g. Team_project: https://github.com/org/pry>
 
 ## Jira
 
@@ -23,7 +24,36 @@
 
 ### Other projects (optional)
 
-- Key: <KEY> — <when to use it>
+- Name: <KEY> — <when to use it>
+- <e.g. Bugs: BUG - for production bug tickets>
+
+---
+
+## Slack (optional)
+
+- Team channel: #<channel-name> (<public/private> — <purpose>)
+- More channels: #<channel-name> (<public/private> — <purpose>)
+- <e.g. Trio channel: #teams-myteam-trio (private — trio private discussions)>
+- Project channels:
+  - #tmp-<project> (<project name>)
+
+---
+
+## Update Sources (optional)
+
+External URLs with information about what happens in the team. Used when generating updates. Examples: meeting notes, incident logs, downtime pages, status dashboards.
+
+- <e.g. Team meeting notes: https://confluence.example.com/pages/123>
+- <e.g. Incidents list: https://confluence.example.com/pages/456>
+
+---
+
+## Career Frameworks (optional)
+
+- Seniority Role: <URL or path>
+- <e.g. Junior: <URL or path>>
+- <e.g. Mid: <URL or path>>
+- <e.g. Senior: <URL or path>>
 
 ---
 
@@ -36,6 +66,7 @@
 - Github username:
 - Seniority:
 - Role:
+- 1:1 file: <URL or path — optional>
 - Notes:
 
 ---
@@ -47,4 +78,5 @@
 - GitHub username:
 - Seniority:
 - Role:
+- 1:1 file: <URL or path — optional>
 - Notes:
