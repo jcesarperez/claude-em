@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.1.0] - 2026-06-xx
+
+### Added
+- `CLAUDE.md` — New `## Credentials` section documenting `.env.local` as the single source for all tokens (`JIRA_API_TOKEN`, `GITHUB_TOKEN`, `FIGMA_TOKEN`). Explicit rule: never ask the user for credentials, never search the keychain or config files
+- `write-update` skill — Write periodic updates (weekly, monthly, etc.) by pulling data from Jira, Slack, Confluence, and Atlas in parallel. Ships with two templates: `weekly_team_update` (team-wide, for engineers and stakeholders) and `weekly_project_update` (project-scoped, for leadership)
+
+---
+
 ## [v2.0.0] - 2026-05-31
 
 > **First breaking release.** If you're upgrading from v1.x, follow the migration steps below before opening Claude.
